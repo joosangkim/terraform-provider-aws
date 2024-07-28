@@ -12,6 +12,7 @@ import (
 
 	"github.com/YakDriver/regexache"
 	awstypes "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-provider-aws/internal/acctest"
@@ -31,6 +32,7 @@ func TestAccEC2CapacityBlockReservation_basic(t *testing.T) {
 	var reservation awstypes.CapacityReservation
 	resourceName := "aws_ec2_capacity_block_reservation.test"
 	dataSourceName := "data.aws_ec2_capacity_block_offering.test"
+	createdDate := time.Now().UTC().Add(25 * time.Hour).Format(time.RFC3339)
 	startDate := time.Now().UTC().Add(25 * time.Hour).Format(time.RFC3339)
 	endDate := time.Now().UTC().Add(720 * time.Hour).Format(time.RFC3339)
 
@@ -47,6 +49,7 @@ func TestAccEC2CapacityBlockReservation_basic(t *testing.T) {
 					acctest.MatchResourceAttrRegionalARN(resourceName, names.AttrARN, "ec2", regexache.MustCompile(`capacity-reservation/cr-:.+`)),
 					resource.TestCheckResourceAttrPair(dataSourceName, names.AttrAvailabilityZone, resourceName, names.AttrAvailabilityZone),
 					resource.TestCheckResourceAttrPair(dataSourceName, "capacity_block_offering_id", resourceName, "capacity_block_offering_id"),
+					resource.TestCheckResourceAttrPair(dataSourceName, "created_date", resourceName, "created_date"),
 					resource.TestCheckResourceAttrPair(dataSourceName, "start_date", resourceName, "start_date"),
 					resource.TestCheckResourceAttrPair(dataSourceName, "end_date", resourceName, "end_date"),
 					resource.TestCheckResourceAttrPair(dataSourceName, names.AttrInstanceCount, resourceName, names.AttrInstanceCount),
